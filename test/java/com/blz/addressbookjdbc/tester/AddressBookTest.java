@@ -30,7 +30,7 @@ public class AddressBookTest {
 	public void contactsRetrivedFromDB_ShouldMatch_ActualCount() throws AddressBookCustomException {
 		List<Contact> contactList = addressBookMain.readContactData();
 		System.out.println(contactList);
-		Assert.assertEquals(6, contactList.size());
+		Assert.assertEquals(7, contactList.size());
 	}
 
 	@Test

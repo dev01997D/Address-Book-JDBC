@@ -94,9 +94,8 @@ public class AddressBookDBService {
 
 		try (Statement statement = connection.createStatement();) {
 			String sql = String.format(
-					"INSERT INTO Contact (Name,Address,City,PhoneNumber,Email,start_Date,Address_Book_Name) values ('%s','%s','%s','%s','%s','%s','%s')",
-					name, address, city, phoneNo, email, startDate, addressBookName);
-			statement.executeUpdate(sql);
+					"INSERT INTO Contact (Name, Address, city, PhoneNumber, Email, start_Date, Address_Book_Name) values ('%s','%s','%s','%s','%s','%s','%s')",
+					name, address, city, phoneNo, email, Date.valueOf(startDate), addressBookName);
 			int rowAffected = statement.executeUpdate(sql);
 			if (rowAffected == 1) {
 				contact = new Contact(name, address, city, phoneNo, email, startDate, addressBookName, addressBookType);
