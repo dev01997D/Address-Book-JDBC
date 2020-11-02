@@ -30,4 +30,12 @@ public class AddressBookTest {
 		System.out.println(contactList);
 		Assert.assertEquals(6, contactList.size());
 	}
+
+	@Test
+	public void givenNewSalaryForEmployee_WhenUpdated_ShouldSyncWithDB() throws AddressBookCustomException {
+		addressBookMain.readContactData();
+		addressBookMain.updateContactDetails("Dev", "Barhi");
+		boolean result = addressBookMain.checkContactInSyncWithDB("Dev");
+		Assert.assertTrue(result);
+	}
 }

@@ -26,4 +26,24 @@ public class AddressBookMain {
 		this.contactList=addressBookDBServiceObj.readData();
 		return  this.contactList;
 	}
+
+	public void updateContactDetails(String name, String city) throws AddressBookCustomException {
+		int noOfRowsAffected=addressBookDBServiceObj.updateContactDB(name, city);
+		if (noOfRowsAffected == 0) {
+			return;
+		}
+		Contact contact = this.getContact(name);
+		if (contact != null)
+			contact.city = city;
+	}
+
+	private Contact getContact(String name) {
+		return contactList.stream().filter(contact->contact.name.equals(name)).findFirst().orElse(null);
+	}
+
+	public boolean checkContactInSyncWithDB(String name) throws AddressBookCustomException {
+		List<Contact> contactDataList = addressBookDBServiceObj.getContact(name);
+		System.out.println(contactDataList);
+		return contactDataList.get(0).equals(getContact(name));
+	}
 }
