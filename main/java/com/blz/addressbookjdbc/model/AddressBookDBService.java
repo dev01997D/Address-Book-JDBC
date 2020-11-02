@@ -19,14 +19,14 @@ public class AddressBookDBService {
 
 	// Reading all the Contact data from the DB
 	public List<Contact> readData() throws AddressBookCustomException {
-		String sql = "SELECT * FROM Contact;";
+		String sql = "SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name);";
 		return this.executeSQLAndReturnContactList(sql);
 	}
 
 	// Execute SQL statement, operate on resultSet and return Contact list
 	public List<Contact> executeSQLAndReturnContactList(String sql) throws AddressBookCustomException {
 		List<Contact> contactList = new ArrayList<>();
-		try (Connection con = addressBookDBServiceObj.getConnection();) {
+		try (Connection con = getConnection();) {
 			Statement stmt = con.createStatement();
 			ResultSet resultSet = stmt.executeQuery(sql);
 			contactList = this.getContactDBData(resultSet);
@@ -46,7 +46,8 @@ public class AddressBookDBService {
 				Long phone = resultSet.getLong("PhoneNumber");
 				String email = resultSet.getString("Email");
 				String addressBookName = resultSet.getString("Address_Book_Name");
-				contactList.add(new Contact(name, address, city, phone, email, addressBookName));
+				String type = resultSet.getString("Type");
+				contactList.add(new Contact(name, address, city, phone, email, addressBookName, type));
 			}
 		} catch (SQLException e) {
 			throw new AddressBookCustomException("Unable to read data Contact data from DB");
@@ -55,7 +56,7 @@ public class AddressBookDBService {
 	}
 
 	// Loading Driver and getting connection object
-	private Connection getConnection() throws AddressBookCustomException {
+	private static Connection getConnection() throws AddressBookCustomException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/address_book_service";
 		String userName = "root";
 		String password = "Kumar@12345";

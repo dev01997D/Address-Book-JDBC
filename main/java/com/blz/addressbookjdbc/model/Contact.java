@@ -7,18 +7,20 @@ public class Contact {
 	public long phoneNo;
 	public String email;
 	public String addressBookName;
+	public String type;
 	
 	public Contact() {
 		
 	}
 
-	public Contact(String name, String address, String city, long phoneNo, String email, String addressBookName) {
+	public Contact(String name, String address, String city, long phoneNo, String email, String addressBookName, String type) {
 		this.name = name;
 		this.address = address;
 		this.city = city;
 		this.phoneNo = phoneNo;
 		this.email = email;
 		this.addressBookName = addressBookName;
+		this.type=type;
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class Contact {
 	@Override
 	public String toString() {
 		return "Contact [name=" + name + ", address=" + address + ", city=" + city + ", phoneNo=" + phoneNo + ", email="
-				+ email + ", addressBookName=" + addressBookName + "]";
+				+ email + ", addressBookName=" + addressBookName + ", Type=" + type + "]";
 	}
 	
 	

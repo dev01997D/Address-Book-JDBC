@@ -24,7 +24,6 @@ public class AddressBookMain {
 
 	public List<Contact> readContactData() throws AddressBookCustomException {
 		this.contactList=addressBookDBServiceObj.readData();
-		System.out.println(this.contactList);
 		return  this.contactList;
 	}
 }
