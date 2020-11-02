@@ -11,6 +11,7 @@ import com.blz.addressbookjdbc.model.Contact;
 
 import junit.framework.Assert;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Before;
@@ -32,10 +33,20 @@ public class AddressBookTest {
 	}
 
 	@Test
-	public void givenNewSalaryForEmployee_WhenUpdated_ShouldSyncWithDB() throws AddressBookCustomException {
+	public void givenNewSalaryForEmployee_WhenUpdatedUsing_ShouldSyncWithDB() throws AddressBookCustomException {
 		addressBookMain.readContactData();
 		addressBookMain.updateContactDetails("Dev", "Barhi");
 		boolean result = addressBookMain.checkContactInSyncWithDB("Dev");
 		Assert.assertTrue(result);
 	}
+	
+	@Test
+	public void givenDateRange_WhenRetrieved_shouldMatchEmployeeCount() throws AddressBookCustomException {
+		addressBookMain.readContactData();
+		LocalDate startDate = LocalDate.of(2018, 01, 15);
+		LocalDate endDate = LocalDate.now();
+		List<Contact> contactList = addressBookMain.readContactsForGivenDateRange(startDate, endDate);
+		Assert.assertEquals(3, contactList.size());
+	}
+	
 }

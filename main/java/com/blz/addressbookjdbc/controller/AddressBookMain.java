@@ -3,6 +3,7 @@
  */
 package com.blz.addressbookjdbc.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.blz.addressbookjdbc.model.AddressBookCustomException;
@@ -45,5 +46,9 @@ public class AddressBookMain {
 		List<Contact> contactDataList = addressBookDBServiceObj.getContact(name);
 		System.out.println(contactDataList);
 		return contactDataList.get(0).equals(getContact(name));
+	}
+
+	public List<Contact> readContactsForGivenDateRange(LocalDate startDate, LocalDate endDate) throws AddressBookCustomException {
+		return addressBookDBServiceObj.readContactForGivenDateRangeFromDB(startDate, endDate);
 	}
 }

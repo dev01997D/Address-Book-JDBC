@@ -2,10 +2,12 @@ package com.blz.addressbookjdbc.model;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,8 +81,8 @@ public class AddressBookDBService {
 
 	public List<Contact> getContact(String name) throws AddressBookCustomException {
 		List<Contact> contactList = null;
-		String sql="SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) where name =?;";
-		if (this.preparedStmt== null)
+		String sql = "SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) where name =?;";
+		if (this.preparedStmt == null)
 			this.preparedStatementForContactData(sql);
 		try {
 			preparedStmt.setString(1, name);
@@ -89,8 +91,15 @@ public class AddressBookDBService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		preparedStmt=null;
+		preparedStmt = null;
 		return contactList;
+	}
+
+	public List<Contact> readContactForGivenDateRangeFromDB(LocalDate startDate, LocalDate endDate)
+			throws AddressBookCustomException {
+		String sql = String.format("SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) WHERE start_Date BETWEEN  '%s'  and '%s';",
+				Date.valueOf(startDate), Date.valueOf(endDate));
+		return this.executeSQLAndReturnContactList(sql);
 	}
 
 	// Use of prepared statement to get employee data from DB
