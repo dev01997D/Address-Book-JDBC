@@ -81,6 +81,50 @@ public class AddressBookDBService {
 		return noOfRowsAffected;
 	}
 
+	public Contact addContactDB(String name, String address, String city, long phoneNo, String email,
+			LocalDate startDate, String addressBookName, String addressBookType) throws AddressBookCustomException {
+		Connection connection = null;
+		Contact contact = null;
+		try {
+			connection = getConnection();
+			connection.setAutoCommit(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		try (Statement statement = connection.createStatement();) {
+			String sql = String.format(
+					"INSERT INTO Contact (Name, Address, city, PhoneNumber, Email, start_Date, Address_Book_Name) values ('%s','%s','%s','%s','%s','%s','%s')",
+					name, address, city, phoneNo, email, Date.valueOf(startDate), addressBookName);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1) {
+				contact = new Contact(name, address, city, phoneNo, email, startDate, addressBookName, addressBookType);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e.printStackTrace();
+			}
+			throw new AddressBookCustomException("Unable to insert into Contact table");
+		}
+
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			throw new AddressBookCustomException("Unable to commit for adding new contact to DB");
+		} finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return contact;
+	}
+
 	public List<Contact> getContact(String name) throws AddressBookCustomException {
 		List<Contact> contactList = null;
 		String sql = "SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) where name =?;";
