@@ -1,7 +1,8 @@
 package com.blz.addressbookjdbc.model;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class AddressBookDBService {
 	private static AddressBookDBService addressBookDBServiceObj;
+	private PreparedStatement preparedStmt = null;
 
 	public static AddressBookDBService getInstance() {
 		if (addressBookDBServiceObj == null)
@@ -53,6 +55,52 @@ public class AddressBookDBService {
 			throw new AddressBookCustomException("Unable to read data Contact data from DB");
 		}
 		return contactList;
+	}
+
+	public int updateContactDB(String name, String city) throws AddressBookCustomException {
+		return this.updateContactDataUsingPreparedStatement(name, city);
+	}
+
+	private int updateContactDataUsingPreparedStatement(String name, String city) throws AddressBookCustomException {
+		String sql = "UPDATE Contact set city =? where name =?";
+		if (preparedStmt == null)
+			preparedStatementForContactData(sql);
+		int noOfRowsAffected = 0;
+		try {
+			preparedStmt.setString(1, city);
+			preparedStmt.setString(2, name);
+			noOfRowsAffected = preparedStmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new AddressBookCustomException("Unable to fetch data from Database!!");
+		}
+		preparedStmt = null;
+		return noOfRowsAffected;
+	}
+
+	public List<Contact> getContact(String name) throws AddressBookCustomException {
+		List<Contact> contactList = null;
+		String sql="SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) where name =?;";
+		if (this.preparedStmt== null)
+			this.preparedStatementForContactData(sql);
+		try {
+			preparedStmt.setString(1, name);
+			ResultSet resultSet = preparedStmt.executeQuery();
+			contactList = this.getContactDBData(resultSet);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		preparedStmt=null;
+		return contactList;
+	}
+
+	// Use of prepared statement to get employee data from DB
+	private void preparedStatementForContactData(String sql) throws AddressBookCustomException {
+		try {
+			Connection con = getConnection();
+			preparedStmt = con.prepareStatement(sql);
+		} catch (SQLException e) {
+			throw new AddressBookCustomException("Error!! during prepared statemennt");
+		}
 	}
 
 	// Loading Driver and getting connection object

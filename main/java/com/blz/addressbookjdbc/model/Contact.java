@@ -13,13 +13,17 @@ public class Contact {
 		
 	}
 
-	public Contact(String name, String address, String city, long phoneNo, String email, String addressBookName, String type) {
+	public Contact(String name, String address, String city, long phoneNo, String email, String addressBookName) {
 		this.name = name;
 		this.address = address;
 		this.city = city;
 		this.phoneNo = phoneNo;
 		this.email = email;
 		this.addressBookName = addressBookName;
+	}
+
+	public Contact(String name, String address, String city, long phoneNo, String email, String addressBookName, String type) {
+		this(name, address, city, phoneNo, email, addressBookName);
 		this.type=type;
 	}
 
