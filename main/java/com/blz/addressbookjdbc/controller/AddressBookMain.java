@@ -5,6 +5,7 @@ package com.blz.addressbookjdbc.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.blz.addressbookjdbc.model.AddressBookCustomException;
 import com.blz.addressbookjdbc.model.AddressBookDBService;
@@ -13,6 +14,7 @@ import com.blz.addressbookjdbc.model.Contact;
 public class AddressBookMain {
 	private List<Contact> contactList;
 	private AddressBookDBService addressBookDBServiceObj;
+	private Map<String, Integer> contactByCityMap;
 
 	public AddressBookMain() {
 		addressBookDBServiceObj = AddressBookDBService.getInstance();
@@ -21,6 +23,11 @@ public class AddressBookMain {
 	public AddressBookMain(List<Contact> contactList) {
 		this();
 		this.contactList = contactList;
+	}
+	
+	public AddressBookMain(Map<String, Integer> contactByCityMap) {
+		this();
+		this.contactByCityMap=contactByCityMap;
 	}
 
 	public List<Contact> readContactData() throws AddressBookCustomException {
@@ -50,5 +57,10 @@ public class AddressBookMain {
 
 	public List<Contact> readContactsForGivenDateRange(LocalDate startDate, LocalDate endDate) throws AddressBookCustomException {
 		return addressBookDBServiceObj.readContactForGivenDateRangeFromDB(startDate, endDate);
+	}
+
+	public Map<String, Integer> readCountOfContactsByCity() throws AddressBookCustomException {
+		contactByCityMap=addressBookDBServiceObj.getContactCountByCityFromDB();
+		return contactByCityMap;
 	}
 }

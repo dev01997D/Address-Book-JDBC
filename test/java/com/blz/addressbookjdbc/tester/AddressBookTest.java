@@ -13,6 +13,7 @@ import junit.framework.Assert;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 
@@ -39,7 +40,7 @@ public class AddressBookTest {
 		boolean result = addressBookMain.checkContactInSyncWithDB("Dev");
 		Assert.assertTrue(result);
 	}
-	
+
 	@Test
 	public void givenDateRange_WhenRetrieved_shouldMatchEmployeeCount() throws AddressBookCustomException {
 		addressBookMain.readContactData();
@@ -48,5 +49,13 @@ public class AddressBookTest {
 		List<Contact> contactList = addressBookMain.readContactsForGivenDateRange(startDate, endDate);
 		Assert.assertEquals(3, contactList.size());
 	}
-	
+
+	@Test
+	public void givenPayrollData_WhenAverageSalaryRetrievedByGender_ShouldReturnCorrectValue()
+			throws AddressBookCustomException {
+		addressBookMain.readContactData();
+		Map<String, Integer> contactCountByCityMap = addressBookMain.readCountOfContactsByCity();
+		Assert.assertTrue(contactCountByCityMap.get("HYD").equals(3) && contactCountByCityMap.get("RNC").equals(1)
+				&& contactCountByCityMap.get("Patna").equals(1) && contactCountByCityMap.get("Barhi").equals(1));
+	}
 }

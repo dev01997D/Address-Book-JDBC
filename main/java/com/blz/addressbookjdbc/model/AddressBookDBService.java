@@ -1,15 +1,17 @@
 package com.blz.addressbookjdbc.model;
 
-import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddressBookDBService {
 	private static AddressBookDBService addressBookDBServiceObj;
@@ -97,9 +99,33 @@ public class AddressBookDBService {
 
 	public List<Contact> readContactForGivenDateRangeFromDB(LocalDate startDate, LocalDate endDate)
 			throws AddressBookCustomException {
-		String sql = String.format("SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) WHERE start_Date BETWEEN  '%s'  and '%s';",
+		String sql = String.format(
+				"SELECT c.*, ad.Type FROM Contact c RIGHT JOIN address_book_dict ad using (Address_Book_Name) WHERE start_Date BETWEEN  '%s'  and '%s';",
 				Date.valueOf(startDate), Date.valueOf(endDate));
 		return this.executeSQLAndReturnContactList(sql);
+	}
+
+	public Map<String, Integer> getContactCountByCityFromDB() throws AddressBookCustomException {
+		String sql = "SELECT City, count(city) from contact group by city;";
+		String operation = "count(city)";
+		return this.executeSQLAndReturnMap(sql, operation);
+	}
+
+	private Map<String, Integer> executeSQLAndReturnMap(String sql, String operation)
+			throws AddressBookCustomException {
+		Map<String, Integer> contactCountByCityMap = new HashMap<>();
+		try (Connection con = getConnection()) {
+			Statement stmt = con.createStatement();
+			ResultSet resultSet = stmt.executeQuery(sql);
+			while (resultSet.next()) {
+				String city = resultSet.getString("city");
+				int count = resultSet.getInt(operation);
+				contactCountByCityMap.put(city, count);
+			}
+		} catch (SQLException e) {
+			throw new AddressBookCustomException("Unable to execute query of function on salary");
+		}
+		return contactCountByCityMap;
 	}
 
 	// Use of prepared statement to get employee data from DB
