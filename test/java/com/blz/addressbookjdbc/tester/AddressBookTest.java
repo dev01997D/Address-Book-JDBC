@@ -4,6 +4,7 @@
 package com.blz.addressbookjdbc.tester;
 
 import org.junit.Test;
+import java.util.logging.*;
 
 import com.blz.addressbookjdbc.controller.AddressBookMain;
 import com.blz.addressbookjdbc.model.AddressBookCustomException;
@@ -11,7 +12,10 @@ import com.blz.addressbookjdbc.model.Contact;
 
 import junit.framework.Assert;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,7 @@ import org.junit.Before;
 
 @SuppressWarnings("deprecation")
 public class AddressBookTest {
+	private static Logger log = Logger.getLogger(AddressBookTest.class.getName());
 	AddressBookMain addressBookMain = null;
 
 	@Before
@@ -30,7 +35,7 @@ public class AddressBookTest {
 	public void contactsRetrivedFromDB_ShouldMatch_ActualCount() throws AddressBookCustomException {
 		List<Contact> contactList = addressBookMain.readContactData();
 		System.out.println(contactList);
-		Assert.assertEquals(7, contactList.size());
+		Assert.assertEquals(6, contactList.size());
 	}
 
 	@Test
@@ -67,5 +72,29 @@ public class AddressBookTest {
 				startDate, "Personal", "family");
 		boolean result = addressBookMain.checkContactInSyncWithDB("Nirmal");
 		Assert.assertTrue(result);
+	}
+
+	/*
+	 * only one add multiple employee method will work as, i have set email as primary key
+	 */
+	@Test
+	public void givenContacts_WhenAddedToDB_ShouldMatchEmployeeEntries() throws AddressBookCustomException {
+		Contact[] arrayOfContacts = {
+				new Contact("Ram", "RNC", "Barhi", 98654331894l, "ramlala@gmail.com", LocalDate.now(), "Casual", "friend"),
+				new Contact("MoNi", "Patna", "Gaya", 96763129897l, "mounikaanne@gmail.com", LocalDate.of(2018, 12, 15),
+						"Personal", "family"),
+				new Contact("Divya", "Delhi", "MG", 8765578954l, "sohailsyed@gmail.com", LocalDate.now(),
+						 "Professional", "Peers") };
+		addressBookMain.readContactData();
+		Instant start = Instant.now();
+		addressBookMain.addMultipleContact(Arrays.asList(arrayOfContacts));
+		Instant end = Instant.now();
+		log.info("Duration without thread : " + Duration.between(start, end));
+		Instant threadStart = Instant.now();
+		addressBookMain.addEmployeeToPayrollWithThreads(Arrays.asList(arrayOfContacts));
+		Instant threadEnd = Instant.now();
+		log.info("Duartion with Thread : " + Duration.between(threadStart, threadEnd));
+		addressBookMain.readContactData();
+		Assert.assertEquals(6, addressBookMain.countEntries());
 	}
 }

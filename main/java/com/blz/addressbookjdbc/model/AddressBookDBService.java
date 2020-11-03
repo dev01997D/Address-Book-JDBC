@@ -81,7 +81,7 @@ public class AddressBookDBService {
 		return noOfRowsAffected;
 	}
 
-	public Contact addContactDB(String name, String address, String city, long phoneNo, String email,
+	public synchronized Contact addContactDB(String name, String address, String city, long phoneNo, String email,
 			LocalDate startDate, String addressBookName, String addressBookType) throws AddressBookCustomException {
 		Connection connection = null;
 		Contact contact = null;
@@ -183,7 +183,7 @@ public class AddressBookDBService {
 	}
 
 	// Loading Driver and getting connection object
-	private static Connection getConnection() throws AddressBookCustomException {
+	private synchronized static Connection getConnection() throws AddressBookCustomException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/address_book_service";
 		String userName = "root";
 		String password = "Kumar@12345";
