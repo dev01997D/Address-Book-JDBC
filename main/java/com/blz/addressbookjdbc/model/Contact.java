@@ -35,6 +35,11 @@ public class Contact {
 		this.type=type;
 	}
 
+	public Contact(String name, String address, String city, long phoneNo, String email, LocalDate startDate, String addressBookName) {
+		this(name, address, city, phoneNo, email, addressBookName);
+		this.startDate=startDate;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

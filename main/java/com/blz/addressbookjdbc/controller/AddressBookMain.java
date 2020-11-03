@@ -4,14 +4,17 @@
 package com.blz.addressbookjdbc.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.blz.addressbookjdbc.model.AddressBookCustomException;
 import com.blz.addressbookjdbc.model.AddressBookDBService;
 import com.blz.addressbookjdbc.model.Contact;
 
 public class AddressBookMain {
+	private static Logger log=Logger.getLogger(AddressBookMain.class.getName());
 	private List<Contact> contactList;
 	private AddressBookDBService addressBookDBServiceObj;
 	private Map<String, Integer> contactByCityMap;
@@ -68,5 +71,50 @@ public class AddressBookMain {
 			LocalDate startDate, String addressBookName, String addressBookType) throws AddressBookCustomException {
 		contactList.add(addressBookDBServiceObj.addContactDB(name, address, city, phoneNo, email, startDate,
 				addressBookName, addressBookType));
+	}
+
+	public void addMultipleContact(List<Contact> contactList) {
+		contactList.forEach(contactData -> {
+			log.info("Employee being added : " + contactData.name);
+			try {
+				this.addContactToAddressBookServiceDB(contactData.name,  contactData.address, contactData.city, contactData.phoneNo, contactData.email,contactData.startDate, 
+						contactData.addressBookName, contactData.type);
+			} catch (AddressBookCustomException e) {
+				e.printStackTrace();
+			}
+			log.info("Employee added : " + contactData.name);
+		});
+		log.info("" + this.contactList);
+	}
+
+	public long countEntries() {
+		return contactList.size();
+	}
+
+	public void addEmployeeToPayrollWithThreads(List<Contact> contactList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
+		contactList.forEach(contactData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(contactData.hashCode(), false);
+				log.info("Employee being added : " + Thread.currentThread().getName());
+				try {
+					this.addContactToAddressBookServiceDB(contactData.name,  contactData.address, contactData.city, contactData.phoneNo, contactData.email,contactData.startDate, 
+							contactData.addressBookName, contactData.type);
+				} catch (AddressBookCustomException e) {
+					e.printStackTrace();
+				}
+				employeeAdditionStatus.put(contactData.hashCode(), true);
+				log.info("Employee added : " + Thread.currentThread().getName());
+			};
+			Thread thread = new Thread(task, contactData.name);
+			thread.start();
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		}
+		log.info("" + this.contactList);
 	}
 }
